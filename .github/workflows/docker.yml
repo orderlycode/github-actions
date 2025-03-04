@@ -14,19 +14,20 @@ on:
         type: string
       env:
         description: base64 encoded .env content (cat .env | base64)
+        required: false
         default: ""
         type: string
-      namespace:
-        type: string
-        default: "default"
       platforms:
         type: string
+        required: false
         default: "linux/amd64,linux/arm64"
       username:
         type: string
+        required: false
         description: registry login username
       password:
         type: string
+        required: false
         description: registry login password
 jobs:
   build:
