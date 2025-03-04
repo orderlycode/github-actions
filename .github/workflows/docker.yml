@@ -59,7 +59,7 @@ jobs:
             .map(tag => `-t ${process.env.REGISTRY}/${process.env.APP_NAME}:${tag}`)
             .join(' ');
           console.log(`docker buildx build --platform ${process.env.PLATFORMS} --push ${tagsArgs} .`)
-          await $`docker buildx build --platform ${process.env.PLATFORMS} --push ${tagsArgs} .`
+          await $.echo`docker buildx build --platform ${process.env.PLATFORMS} --push ${tagsArgs} .`
           EOF
         env:
           PLATFORMS: ${{ inputs.platforms}}
