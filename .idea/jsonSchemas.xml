@@ -17,6 +17,9 @@
                   <Item>
                     <option name="path" value=".github/workflow/docker.yml" />
                   </Item>
+                  <Item>
+                    <option name="path" value=".github/workflows/docker.yml" />
+                  </Item>
                 </list>
               </option>
             </SchemaInfo>
