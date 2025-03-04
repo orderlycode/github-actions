@@ -56,7 +56,7 @@ jobs:
           npx zx <<'EOF'
           const tags = process.env.TAGS.split(',')
           let tagsArgs = tags
-            .map(tag => `-t ${process.env.REGISTRY}/${process.env.APP_NAME}:${tag}`)
+            .map(tag => `-t "${process.env.REGISTRY}/${process.env.APP_NAME}:${tag}"`)
             .join(' ');
           console.log(`docker buildx build --platform ${process.env.PLATFORMS} --push ${tagsArgs} .`)
           await $.echo`docker buildx build --platform ${process.env.PLATFORMS} --push ${tagsArgs} .`
