@@ -28,19 +28,19 @@ on:
         required: true
         description: registry login password
 jobs:
-  # setup:
-  #   runs-on: self-hosted
-  #   outputs:
-  #     REGISTRY: ${{ steps.setup.outputs.APP_NAME }}
-  #     USER_NAME: ${{ steps.setup.outputs.TAGS }}
-  #     PASSWORD: ${{ steps.env_file.outputs.ENV_FILE }}
-  #   steps:
-  #     - name: Setup
-  #       id: setup
-  #       run: |
-  #         echo "REGISTRY=$(${{ secrets.HUB_HOST }} | base64 -d)" >> $GITHUB_OUTPUT
-  #         echo "USER_NAME=$(${{ secrets.HUB_USERNAME }} | base64 -d)" >> $GITHUB_OUTPUT
-  #         echo "PASSWORD=$(${{ secrets.HUB_PASSWORD }} | base64 -d)" >> $GITHUB_OUTPUT
+  setup:
+    runs-on: self-hosted
+    outputs:
+      HUB_HOST: ${{ steps.setup.outputs.APP_NAME }}
+      HUB_USERNAME: ${{ steps.setup.outputs.TAGS }}
+      HUB_PASSWORD: ${{ steps.env_file.outputs.ENV_FILE }}
+    steps:
+      - name: Setup
+        id: setup
+        run: |
+          echo "HUB_HOST=$(${{ secrets.HUB_HOST }} | base64 -d)" >> $GITHUB_OUTPUT
+          echo "HUB_USERNAME=$(${{ secrets.HUB_USERNAME }} | base64 -d)" >> $GITHUB_OUTPUT
+          echo "HUB_PASSWORD=$(${{ secrets.HUB_PASSWORD }} | base64 -d)" >> $GITHUB_OUTPUT
   build:
     runs-on: self-hosted
     steps:
@@ -55,20 +55,18 @@ jobs:
         run: echo ${{ inputs.env }} | base64 -d > .env
 
       - name: Decode Base64
+        id: decode
         run: |
-          echo ${{ secrets.HUB_HOST }} | base64
-          echo ${{ secrets.HUB_USERNAME }} | base64
-          echo ${{ secrets.HUB_PASSWORD }} | base64
-          echo "HUB_HOST=$(${{ secrets.HUB_HOST }} | base64 -d)" >> $GITHUB_ENV
-          echo "HUB_USERNAME=$(${{ secrets.HUB_USERNAME }} | base64 -d)" >> $GITHUB_ENV
-          echo "HUB_PASSWORD=$(${{ secrets.HUB_PASSWORD }} | base64 -d)" >> $GITHUB_ENV
+          echo "HUB_HOST=$(${{ secrets.HUB_HOST }} | base64 -d)" >> $GITHUB_OUTPUT
+          echo "HUB_USERNAME=$(${{ secrets.HUB_USERNAME }} | base64 -d)" >> $GITHUB_OUTPUT
+          echo "HUB_PASSWORD=$(${{ secrets.HUB_PASSWORD }} | base64 -d)" >> $GITHUB_OUTPUT
 
       - name: Login
         uses: "docker/login-action@v3"
         with:
-          username: ${{ env.HUB_USERNAME }}
-          password: ${{ env.HUB_PASSWORD }}
-          registry: ${{ env.HUB_HOST }}
+          username: ${{ steps.decode.HUB_USERNAME }}
+          password: ${{ steps.decode.HUB_PASSWORD }}
+          registry: ${{ steps.decode.HUB_HOST }}
 
       - name: Build and Push Image
         run: |
@@ -83,6 +81,6 @@ jobs:
           EOF
         env:
           PLATFORMS: ${{ inputs.platforms}}
-          REGISTRY: ${{ env.HUB_HOST }}
+          REGISTRY: ${{ steps.decode.HUB_HOST }}
           APP_NAME: ${{ inputs.app_name}}
           TAGS: ${{ inputs.tags}}
