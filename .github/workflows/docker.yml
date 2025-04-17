@@ -2,9 +2,6 @@ name: Build docker image and push
 on:
   workflow_call:
     inputs:
-      registry:
-        required: true
-        type: string
       app_name:
         required: true
         type: string
@@ -21,13 +18,14 @@ on:
         type: string
         required: false
         default: "linux/amd64,linux/arm64"
+    secrets:
+      registry:
+        required: true
       username:
-        type: string
-        required: false
+        required: true
         description: registry login username
       password:
-        type: string
-        required: false
+        required: true
         description: registry login password
 jobs:
   build:
