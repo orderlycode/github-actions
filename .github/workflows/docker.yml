@@ -41,13 +41,20 @@ jobs:
         if: ${{ inputs.env != ''}}
         run: echo ${{ inputs.env }} | base64 -d > .env
 
+      - name: Decode Base64
+        if: ${{ inputs.env != ''}}
+        run: |
+          echo REGISTRY=${{ secrets.registry }} | base64 -d >> $GITHUB_ENV
+          echo USER_NAME=${{ secrets.username }} | base64 -d >> $GITHUB_ENV
+          echo PASSWORD=${{ secrets.password }} | base64 -d >> $GITHUB_ENV
+        
       - name: Login
         if: ${{ secrets.username && secrets.password }}
         uses: "docker/login-action@v3"
         with:
-          username: ${{ secrets.username }}
-          password: ${{ secrets.password }}
-          registry: ${{ secrets.registry }}
+          username: ${{ env.USER_NAME }}
+          password: ${{ env.PASSWORD }}
+          registry: ${{ env.REGISTRY }}
 
       - name: Build and Push Image
         run: |
@@ -62,6 +69,6 @@ jobs:
           EOF
         env:
           PLATFORMS: ${{ inputs.platforms}}
-          REGISTRY: ${{ secrets.registry}}
+          REGISTRY: ${{ env.REGISTRY}}
           APP_NAME: ${{ inputs.app_name}}
           TAGS: ${{ inputs.tags}}
